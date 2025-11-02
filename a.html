@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NetMaster + Py — ملون ومتحرّك (مصحّح)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  /* (نفس الـ CSS السابق بدون تغيير جوهري) */
+  :root{
+    --bg-deep: #030416;
+    --glass: rgba(255,255,255,0.02);
+    --muted: #9fb3c8;
+    --text: #e8f4ff;
+    --shadow: 0 12px 36px rgba(2,6,23,0.65);
+    --color-tools-a: #ff6b6b; --color-tools-b: #ff8a5b;
+    --color-search-a:#7c3aed; --color-search-b:#60a5fa;
+    --color-python-a:#10b981; --color-python-b:#06b6d4;
+    --color-courses-a:#fb7185; --color-courses-b:#f59e0b;
+    --color-security-a:#60a5fa; --color-security-b:#7c3aed;
+    --accent-glow: 0 10px 30px rgba(124,58,237,0.08);
+    font-family: "Inter", "Noto Kufi Arabic", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#021021,#041533 40%, #071427 100%);color:var(--text);-webkit-font-smoothing:antialiased}
+  body:before{content:"";position:fixed;inset:0;z-index:-1;background:conic-gradient(from 120deg at 50% 50%, rgba(96,165,250,0.04), rgba(124,58,237,0.03), rgba(16,185,129,0.03), rgba(251,113,133,0.02));opacity:0.9;animation:spinBG 28s linear infinite}
+  @keyframes spinBG{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+  .container{max-width:1240px;margin:20px auto;padding:18px;display:grid;grid-template-columns:300px 1fr;gap:18px}
+  @media(max-width:920px){.container{grid-template-columns:1fr;padding:12px}}
+  .sidebar{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.03);box-shadow:var(--shadow)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--color-search-a),var(--color-python-b));display:flex;align-items:center;justify-content:center;font-weight:900;color:#021}
+  .muted{color:var(--muted);font-size:13px}
+  nav{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  nav button{background:transparent;border:0;padding:10px;border-radius:8px;text-align:right;color:var(--text);font-weight:700;cursor:pointer;transition:transform .18s, color .18s}
+  nav button:hover{transform:translateX(-6px)}
+  nav button.active{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:var(--text);box-shadow:var(--accent-glow) inset}
+  .actions{display:flex;gap:8px;margin-top:12px}
+  .btn{background:linear-gradient(90deg,var(--color-python-a),var(--color-python-b));color:#021;padding:9px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:800;transition:transform .18s, box-shadow .18s}
+  .btn:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(6,182,212,0.06)}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px;border-radius:10px;color:var(--text);cursor:pointer}
+  .main{display:flex;flex-direction:column;gap:12px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:var(--shadow);transition:transform .25s ease, box-shadow .25s}
+  .card:hover{transform:translateY(-6px)}
+  .row{display:flex;gap:12px}
+  .col{flex:1}
+  h2{margin:0 0 6px 0}
+  pre, textarea, input{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace}
+  textarea{width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:rgba(255,255,255,0.01);color:var(--text);min-height:120px;resize:vertical}
+  input[type="text"]{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:rgba(255,255,255,0.01);color:var(--text);width:100%}
+  .chat-window{height:44vh;overflow:auto;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(6,182,212,0.012), rgba(124,58,237,0.008));border:1px solid rgba(255,255,255,0.02)}
+  .msg{margin-bottom:10px;display:flex;gap:8px;align-items:flex-start}
+  .bubble{padding:10px;border-radius:12px;max-width:78%;font-size:14px}
+  .user{margin-left:auto;background:linear-gradient(90deg,var(--color-courses-a),var(--color-courses-b));color:#021}
+  .bot{background:rgba(0,0,0,0.28);color:var(--text)}
+  .mono{font-family:monospace;font-size:13px}
+  .section-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .accent-pill{padding:6px 10px;border-radius:999px;color:#021;font-weight:800}
+  .sec-tools .accent-pill{background:linear-gradient(90deg,var(--color-tools-a),var(--color-tools-b));}
+  .sec-search .accent-pill{background:linear-gradient(90deg,var(--color-search-a),var(--color-search-b));}
+  .sec-python .accent-pill{background:linear-gradient(90deg,var(--color-python-a),var(--color-python-b));}
+  .sec-courses .accent-pill{background:linear-gradient(90deg,var(--color-courses-a),var(--color-courses-b));}
+  .sec-security .accent-pill{background:linear-gradient(90deg,var(--color-security-a),var(--color-security-b));}
+  .animated-underline{position:relative;overflow:hidden}
+  .animated-underline:after{content:'';position:absolute;left:0;bottom:0;height:3px;width:100%;background:linear-gradient(90deg,#fff3, #fff0);transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.2,.9,.3,1)}
+  .animated-underline:hover:after{transform:scaleX(1)}
+  .ripple{position:relative;overflow:hidden}
+  .ripple:after{content:'';position:absolute;border-radius:50%;transform:scale(0);opacity:.6;transition:transform .6s, opacity 1s;pointer-events:none}
+  .ripple:active:after{transform:scale(10);opacity:0}
+  .floaty{animation:floaty 6s ease-in-out infinite}
+  @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:none}}
+  .sparkle{position:absolute;pointer-events:none;mix-blend-mode:screen}
+  footer{margin-top:14px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">NM</div>
+        <div>
+          <div style="font-weight:900">NetMaster + Py</div>
+          <div class="muted">شبكات • سكيورتي • برمجة</div>
+        </div>
+      </div>
+
+      <nav aria-label="Main nav">
+        <button class="active" data-target="dash">الرئيسية</button>
+        <button data-target="tools">الأدوات</button>
+        <button data-target="search">البحث & المساعد</button>
+        <button data-target="python">بايثون</button>
+        <button data-target="courses">الدورات</button>
+        <button data-target="security">سيكيورتي</button>
+        <button data-target="about">عن</button>
+      </nav>
+
+      <div style="margin-top:14px">
+        <div class="small">إجراءات سريعة</div>
+        <div class="actions">
+          <button class="btn ripple" id="open-python">فتح بايثون</button>
+          <button class="btn-ghost ripple" id="clear-local">مسح محلي</button>
+        </div>
+      </div>
+
+      <div style="margin-top:14px" class="muted">ملاحظة: بايثون هنا يشتغل داخل المتصفح (Pyodide) — آمن ولا يحتاج تثبيت.</div>
+    </aside>
+
+    <main class="main">
+      <section id="dash" class="card floaty sec-search">
+        <div class="section-header">
+          <div>
+            <h2>جاهز للشغل — قلّي عايز تعمل إيه</h2>
+            <div class="muted" style="margin-top:6px">حاسبة، مكتبة أوامر، تحليل config، ومحرر Python لتشغيل وظائف شبكات مباشرة.</div>
+          </div>
+          <div class="accent-pill">ابدا من هنا</div>
+        </div>
+      </section>
+
+      <section id="tools" class="card sec-tools" style="display:none">
+        <div class="section-header">
+          <div style="font-weight:800">أدوات سريعة</div>
+          <div class="accent-pill">Subnet & Config</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+          <div class="card floaty" style="border-left:6px solid var(--color-tools-a);">
+            <div style="font-weight:800">Subnet Calculator (JS)</div>
+            <div style="display:grid;gap:8px;margin-top:8px">
+              <input id="js-ip" placeholder="مثال: 192.168.1.0">
+              <div style="display:flex;gap:8px">
+                <input id="js-cidr" type="number" min="0" max="32" value="24">
+                <input id="js-hosts" type="number" placeholder="عدد المضيفين (اختياري)">
+                <button class="btn ripple" id="js-calc">احسب</button>
+              </div>
+            </div>
+            <div id="js-out" style="margin-top:10px"></div>
+          </div>
+
+          <div class="card floaty" style="border-left:6px solid var(--color-tools-b);">
+            <div style="font-weight:800">Config Parser (JS)</div>
+            <textarea id="js-cfg" placeholder="ألصق running-config هنا..." rows="6"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn ripple" id="js-parse">Parse</button>
+              <button class="btn-ghost ripple" id="js-clear-cfg">مسح</button>
+            </div>
+            <div id="js-cfg-out" style="margin-top:10px"></div>
+          </div>
+
+          <div class="card floaty sec-courses" style="border-left:6px solid var(--color-courses-a);">
+            <div style="font-weight:800">JS Runner (تعليمي)</div>
+            <textarea id="js-code" rows="8">// مثال: console.log('hello from JS')</textarea>
+            <div style="display:flex;gap:8px;margin-top:8px"><button class="btn ripple" id="js-run">Run</button><button class="btn-ghost ripple" id="js-clear-out">Clear</button></div>
+            <pre id="js-out" style="margin-top:8px;background:#041422;padding:10px;border-radius:8px;min-height:60px"></pre>
+          </div>
+
+          <div class="card floaty sec-security" style="border-left:6px solid var(--color-security-a);">
+            <div style="font-weight:800">Shortcuts & Security tips</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+              <button class="btn-ghost ripple" id="open-search">افتح المساعد</button>
+              <button class="btn-ghost ripple" id="open-python-2">التحويل لبايثون</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="search" class="card sec-search" style="display:none">
+        <div class="section-header">
+          <div style="font-weight:800">المساعد & بحث من الإنترنت</div>
+          <div class="accent-pill">DuckDuckGo • Wikipedia • RSS</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <input id="q-input" placeholder="اسأل عن subnet، ARP spoofing، إلخ">
+          <button class="btn ripple" id="q-btn">اسأل</button>
+        </div>
+        <div class="small" style="margin-top:8px">مصادر: DuckDuckGo Instant Answer + Wikipedia + RSS feeds</div>
+        <div id="q-out" style="margin-top:12px"></div>
+      </section>
+
+      <section id="python" class="card sec-python" style="display:none">
+        <div class="section-header">
+          <div style="font-weight:800">محرر بايثون (Pyodide)</div>
+          <div class="accent-pill">ipaddress • أدوات</div>
+        </div>
+        <div class="small" style="margin-top:6px">شغّل بايثون داخل المتصفّح — يمكن استخدام مكتبة stdlib مثل <code>ipaddress</code>.</div>
+
+        <div style="margin-top:12px" class="py-area">
+          <textarea id="py-code" class="py-editor"># أمثلة جاهزة:
+from ipaddress import ip_network, ip_address
+
+def compute_subnet_py(net, prefix):
+    n = ip_network(f"{net}/{prefix}", strict=False)
+    hosts = list(n.hosts())
+    return {
+        "network": str(n.network_address),
+        "broadcast": str(n.broadcast_address),
+        "netmask": str(n.netmask),
+        "first": str(hosts[0]) if hosts else str(n.network_address),
+        "last": str(hosts[-1]) if hosts else str(n.broadcast_address),
+        "usable": len(hosts)
+    }
+
+# استعمل compute_subnet_py("192.168.1.0",24)
+</textarea>
+
+          <div style="display:flex;gap:8px">
+            <button class="btn ripple" id="py-run">شغل بايثون</button>
+            <button class="btn-ghost ripple" id="py-clear">مسح النتائج</button>
+            <div class="right small">Pyodide: <span id="py-version">—</span></div>
+          </div>
+
+          <div style="margin-top:10px" class="py-output" id="py-out">لم يتم تشغيل شيء بعد.</div>
+
+        </div>
+      </section>
+
+      <section id="courses" class="card sec-courses" style="display:none">
+        <div class="section-header"><div style="font-weight:800">الدورات</div><div class="accent-pill">برمجة • شبكات • أمن</div></div>
+        <div class="muted" style="margin-top:6px">ممكن نضيف دورات منظمة لاحقًا (فيديو، امتحانات، شهادات).</div>
+      </section>
+
+      <section id="security" class="card sec-security" style="display:none">
+        <div class="section-header"><div style="font-weight:800">سيكيورتي</div><div class="accent-pill">نصائح سريعة</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:10px">
+          <div class="list-item" style="border-left:6px solid var(--color-security-a)"><strong>حماية الراوتر</strong><div class="small">غيّر كلمة السر، فعّل SSH، واستخدم ACL.</div></div>
+          <div class="list-item" style="border-left:6px solid var(--color-security-b)"><strong>ARP Spoofing</strong><div class="small">DAI, DHCP snooping, port-security.</div></div>
+        </div>
+      </section>
+
+      <section id="about" class="card" style="display:none">
+        <h3 style="margin-top:0">عن NetMaster + Py</h3>
+        <div class="small">نسخة مُعدّلة: ألوان أكثر، أنيميشن، ودوال منظمة—كل شيء يعمل بدون سيرفر.</div>
+      </section>
+
+      <footer>NetMaster — Abo Joury — Multi-color animated edition (مصحح)</footer>
+    </main>
+  </div>
+
+<script>
+/* Clean helpers */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* Navigation */
+const navButtons = document.querySelectorAll('aside nav button');
+navButtons.forEach(btn => btn.addEventListener('click', ()=>{
+  const id = btn.dataset.target;
+  document.querySelectorAll('main .card').forEach(c=> c.style.display = 'none');
+  const target = document.getElementById(id);
+  if(target) target.style.display = 'block';
+  navButtons.forEach(b=> b.classList.toggle('active', b === btn));
+  assignSectionHighlight(id);
+  window.scrollTo({top:0, behavior:'smooth'});
+}));
+document.querySelector('aside nav button[data-target="dash"]').click();
+
+/* Section highlight */
+function assignSectionHighlight(sectionId){
+  document.querySelectorAll('.card').forEach(card => card.style.boxShadow = 'var(--shadow)');
+  const sec = document.getElementById(sectionId);
+  if(!sec) return;
+  let grd = '';
+  switch(sectionId){
+    case 'tools': grd = `0 18px 50px rgba(255,110,110,0.06)`; break;
+    case 'search': grd = `0 18px 50px rgba(120,58,237,0.06)`; break;
+    case 'python': grd = `0 18px 50px rgba(16,185,129,0.06)`; break;
+    case 'courses': grd = `0 18px 50px rgba(251,113,133,0.06)`; break;
+    case 'security': grd = `0 18px 50px rgba(96,165,250,0.06)`; break;
+    default: grd = `0 18px 50px rgba(124,58,237,0.05)`;
+  }
+  sec.style.boxShadow = grd;
+  pulseElement(sec);
+}
+function pulseElement(el){
+  el.animate([{ transform: 'scale(1)', opacity: 1 },{ transform: 'scale(1.01)', opacity: 0.99 },{ transform: 'scale(1)', opacity: 1 }], { duration: 700, easing: 'ease-in-out' });
+}
+
+/* button ripple (keeps it safe) */
+document.querySelectorAll('.ripple').forEach(btn => {
+  btn.addEventListener('click', function(e){
+    const r = document.createElement('span');
+    r.style.position = 'absolute'; r.style.borderRadius='50%'; r.style.pointerEvents='none'; r.style.background='rgba(255,255,255,0.08)';
+    const rect = this.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height)*1.6; r.style.width = r.style.height = size+'px';
+    r.style.left = (e.clientX - rect.left - size/2) + 'px'; r.style.top = (e.clientY - rect.top - size/2) + 'px'; r.style.transform='scale(0)'; r.style.opacity='1';
+    r.style.transition = 'transform .7s ease, opacity 1s ease';
+    this.appendChild(r);
+    requestAnimationFrame(()=> r.style.transform='scale(1)');
+    setTimeout(()=>{ r.style.opacity='0'; setTimeout(()=> r.remove(), 1000); }, 600);
+  });
+});
+
+/* Tools logic */
+function ipToInt(ip){ const p = ip.trim().split('.'); if(p.length!==4) throw 'Invalid IP'; return ((parseInt(p[0])<<24)>>>0) + (parseInt(p[1])<<16) + (parseInt(p[2])<<8) + parseInt(p[3]); }
+function intToIp(i){ return [(i>>>24)&255,(i>>>16)&255,(i>>>8)&255,i&255].join('.'); }
+function cidrToMask(c){ return c===0?0:((0xffffffff << (32-c))>>>0); }
+
+function computeSubnetJS(ip, cidr){
+  const ipi = ipToInt(ip); const mask = cidrToMask(cidr); const network = ipi & mask; const bcast = network | ((~mask)>>>0);
+  const first = cidr===32?network:network+1; const last = cidr>=31?bcast:bcast-1;
+  const usable = cidr>=31? (cidr===31?2:1) : Math.max(0,(1<<(32-cidr))-2);
+  return {network:intToIp(network), broadcast:intToIp(bcast), netmask:intToIp(mask>>>0), first:intToIp(first), last:intToIp(last), usable};
+}
+
+$('js-calc').addEventListener('click', ()=>{
+  try{
+    const ip = $('js-ip').value.trim(); const cidr = parseInt($('js-cidr').value);
+    const hosts = parseInt($('js-hosts').value) || 0;
+    if(!ip) return alert('ادخل IP'); if(isNaN(cidr) || cidr<0 || cidr>32) return alert('CIDR غير صحيح');
+    const r = computeSubnetJS(ip,cidr);
+    let html = `<pre>Network: ${r.network}\nBroadcast: ${r.broadcast}\nMask: ${r.netmask}\nRange: ${r.first} — ${r.last}\nUsable: ${r.usable} hosts</pre>`;
+    if(hosts>0){ let needed = hosts+2, bits=0; while((1<<bits) < needed) bits++; html += `<div class="muted">اقتراح prefix: /${32-bits}</div>`; }
+    $('js-out').innerHTML = html;
+  }catch(e){ alert('خطأ: '+e); }
+});
+
+$('js-parse').addEventListener('click', ()=>{
+  const txt = $('js-cfg').value; const lines = txt.split('\n'); const interfaces = []; let cur = null;
+  for(let raw of lines){ const line = raw.trim();
+    if(line.startsWith('interface ')){ if(cur) interfaces.push(cur); cur = {name:line.substring(10).trim(), ips:[], admin:'down', desc:''}; }
+    else if(cur && line.startsWith('ip address ')){ const parts=line.split(/\s+/); cur.ips.push(parts.slice(2).join(' ')); }
+    else if(cur && line === 'no shutdown'){ cur.admin='up'; }
+    else if(cur && line.startsWith('description ')){ cur.desc=line.substring(12).trim(); }
+  }
+  if(cur) interfaces.push(cur);
+  const out = $('js-cfg-out'); out.innerHTML = '';
+  if(interfaces.length===0) out.innerHTML = '<div class="muted">لا واجهات</div>';
+  interfaces.forEach(it=>{
+    const div = document.createElement('div'); div.className='list-item'; div.style.marginTop='8px';
+    div.innerHTML = `<div style="font-weight:800">${esc(it.name)}</div><div class="muted">IPs: ${esc(it.ips.join(', ')||'—')}</div><div class="muted">Admin: ${esc(it.admin)}</div><div class="muted">Desc: ${esc(it.desc||'—')}</div>`;
+    out.appendChild(div);
+  });
+});
+
+$('js-clear-cfg').addEventListener('click', ()=>{ $('js-cfg').value=''; $('js-cfg-out').innerHTML=''; });
+$('js-run').addEventListener('click', ()=>{ const src = $('js-code').value; try{ const res = (new Function(src))(); $('js-out').innerText = res === undefined ? 'تم التنفيذ' : JSON.stringify(res, null, 2); }catch(err){ $('js-out').innerText = 'Error: '+err; } });
+$('js-clear-out').addEventListener('click', ()=> $('js-out').innerText='');
+
+/* Search aggregator */
+async function ddgInstant(q){ try{ const url = 'https://api.duckduckgo.com/?q='+encodeURIComponent(q)+'&format=json&no_html=1&skip_disambig=1'; const r = await fetch(url); return await r.json(); }catch(e){ console.warn(e); return null; } }
+async function wikiSummary(q){ try{ const title = encodeURIComponent(q.replace(/\s+/g,'_')); const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${title}`; const r = await fetch(url); if(r.status===200) return await r.json(); return null; }catch(e){ console.warn(e); return null; } }
+
+$('q-btn').addEventListener('click', async ()=>{
+  const q = $('q-input').value.trim(); if(!q) return alert('اكتب السؤال');
+  const out = $('q-out'); out.innerHTML = '<div class="muted">جاري البحث...</div>'; out.innerHTML = '';
+  const ddg = await ddgInstant(q);
+  if(ddg && (ddg.AbstractText || (ddg.RelatedTopics && ddg.RelatedTopics.length))){
+    if(ddg.AbstractText) out.innerHTML += `<div class="list-item"><div style="font-weight:800">${esc(ddg.Heading||q)}</div><div class="muted" style="margin-top:6px">${esc(ddg.AbstractText)}</div><div style="margin-top:8px"><a href="https://duckduckgo.com/?q=${encodeURIComponent(q)}" target="_blank">رابط</a></div></div>`;
+    if(ddg.RelatedTopics && ddg.RelatedTopics.length){ ddg.RelatedTopics.slice(0,3).forEach(rt=>{ const text = rt.Text || rt.Result || ''; out.innerHTML += `<div class="list-item"><div style="font-weight:800">${esc((rt.Text||'Result').split(' - ')[0])}</div><div class="muted">${esc(text)}</div></div>`; }); }
+  } else {
+    const wik = await wikiSummary(q);
+    if(wik && wik.extract){ out.innerHTML += `<div class="list-item"><div style="font-weight:800">${esc(wik.title)}</div><div class="muted" style="margin-top:6px">${esc(wik.extract)}</div><div style="margin-top:8px"><a href="${esc(wik.content_urls?.desktop?.page||'https://en.wikipedia.org/wiki/'+encodeURIComponent(q))}" target="_blank">رابط</a></div></div>`; }
+    else out.innerHTML = '<div class="muted">لا نتائج مباشرة — جرّب كلمة أخرى.</div>';
+  }
+});
+
+/* Pyodide loader (robust, fixed: no optional-chaining on LHS) */
+function loadScript(src){
+  return new Promise((res, rej) => {
+    if(document.querySelector('script[src="'+src+'"]')) return res();
+    const s = document.createElement('script');
+    s.src = src; s.async = true;
+    s.onload = () => res(); s.onerror = (e)=> rej(e);
+    document.head.appendChild(s);
+  });
+}
+
+let pyodide = null;
+async function loadPyodideAndPackages(){
+  const pyVerEl = $('py-version'); const pyOutEl = $('py-out'); try{
+    if(pyVerEl) pyVerEl.innerText = 'جارٍ التحميل... (1/3)';
+    const CDN = 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/';
+    const scriptURL = CDN + 'pyodide.js';
+    let lastErr = null;
+    for(let attempt=1; attempt<=3; attempt++){
+      try{
+        if(pyVerEl) pyVerEl.innerText = `جارٍ تحميل Pyodide... (محاولة ${attempt} من 3)`;
+        await loadScript(scriptURL);
+        pyodide = await window.loadPyodide({ indexURL: CDN });
+        // set version safely
+        try{
+          const ver = pyodide.runPython('import sys; sys.version.split()[0]');
+          if(pyVerEl) pyVerEl.innerText = ver;
+        }catch(e){ if(pyVerEl) pyVerEl.innerText = 'Py ready'; }
+        if(pyOutEl) pyOutEl.innerText = 'Pyodide محمل وجاهز.';
+        return;
+      }catch(err){
+        console.warn('Pyodide load attempt', attempt, err);
+        lastErr = err;
+        await new Promise(r=>setTimeout(r, 800 * attempt));
+      }
+    }
+    if(pyVerEl) pyVerEl.innerText = 'فشل التحميل';
+    if(pyOutEl) pyOutEl.innerText = 'فشل تحميل Pyodide بعد 3 محاولات. تأكد من اتصال الإنترنت أو شغّل الملف عبر http://localhost:8000';
+    console.error('Pyodide failed:', lastErr);
+  }catch(e){
+    console.error('Loader unexpected error', e);
+    if($('py-version')) $('py-version').innerText = 'خطأ';
+    if($('py-out')) $('py-out').innerText = 'خطأ غير متوقع أثناء التحميل: ' + e;
+  }
+}
+loadPyodideAndPackages();
+
+/* run python helper */
+async function runPython(code){
+  if(!pyodide) return {error:'Pyodide not ready'};
+  try{
+    let stdout = '';
+    pyodide.setStdout({ batched: (s)=>{ stdout += s; } });
+    pyodide.setStderr({ batched: (s)=>{ stdout += s; } });
+    const result = await pyodide.runPythonAsync(code);
+    return { result, stdout };
+  }catch(err){ return { error: String(err) }; }
+}
+
+async function computeSubnetPy(net,prefix){
+  const code = `from ipaddress import ip_network\nn = ip_network("${net}/${prefix}", strict=False)\nhosts = list(n.hosts())\nres = {"network":str(n.network_address),"broadcast":str(n.broadcast_address),"netmask":str(n.netmask),"first":str(hosts[0]) if hosts else str(n.network_address),"last":str(hosts[-1]) if hosts else str(n.broadcast_address),"usable":len(hosts)}\nres`;
+  const r = await runPython(code);
+  if(r.error) return {error:r.error};
+  return r.result.toJs ? r.result.toJs() : r.result;
+}
+
+async function parseConfigPy(cfgText){
+  const safe = cfgText.replace(/`/g,'`');
+  const code = `def parse_config(txt):\n    interfaces = []\n    cur = None\n    for line in txt.splitlines():\n        l = line.strip()\n        if l.startswith('interface '):\n            if cur: interfaces.append(cur)\n            cur = {'name': l[len('interface '):].strip(), 'ips':[], 'admin':'down', 'desc':''}\n        elif cur and l.startswith('ip address '):\n            parts = l.split()\n            cur['ips'].append(' '.join(parts[2:]))\n        elif cur and l == 'no shutdown':\n            cur['admin'] = 'up'\n        elif cur and l.startswith('description '):\n            cur['desc'] = l[len('description '):].strip()\n    if cur: interfaces.append(cur)\n    return interfaces\n\nparse_config_result = parse_config(\"\"\"${safe}\"\"\")\nparse_config_result`;
+  const r = await runPython(code);
+  if(r.error) return {error:r.error};
+  return r.result.toJs ? r.result.toJs() : r.result;
+}
+
+/* UI: python run */
+$('py-run').addEventListener('click', async ()=>{
+  const code = $('py-code').value;
+  const outEl = $('py-out');
+  if(outEl) outEl.innerText = 'جارٍ التنفيذ...';
+  const r = await runPython(code + '\n\n# end');
+  if(r.error){
+    if(outEl) outEl.innerText = 'Error: ' + r.error;
+  }else{
+    let out = '';
+    if(r.stdout) out += r.stdout + '\n';
+    if(r.result !== undefined && r.result !== null){
+      try{ out += JSON.stringify(r.result.toJs ? r.result.toJs() : r.result, null, 2); }catch(e){ out += String(r.result); }
+    }
+    if(outEl) outEl.innerText = out || 'تم التنفيذ — لا مخرجات';
+  }
+});
+
+$('py-clear').addEventListener('click', ()=> { if($('py-out')) $('py-out').innerText = ''; });
+
+/* helpers and bindings */
+$('open-python').addEventListener('click', ()=> document.querySelector('aside nav button[data-target="python"]').click());
+$('open-search').addEventListener('click', ()=> document.querySelector('aside nav button[data-target="search"]').click());
+
+$('open-python-2').addEventListener('click', ()=>{
+  const cfg = $('js-cfg').value;
+  document.querySelector('aside nav button[data-target="python"]').click();
+  setTimeout(()=>{ const py = $('py-code'); if(py) py.value = `# تحليل config بواسطة Python\ncfg_text = '''${cfg}'''\nfrom ipaddress import ip_network\n\ndef parse_config(txt):\n    interfaces=[]\n    cur=None\n    for line in txt.splitlines():\n        l=line.strip()\n        if l.startswith('interface '):\n            if cur: interfaces.append(cur)\n            cur={'name':l[len('interface '):].strip(), 'ips':[], 'admin':'down', 'desc':''}\n        elif cur and l.startswith('ip address '):\n            parts=l.split()\n            cur['ips'].append(' '.join(parts[2:]))\n        elif cur and l=='no shutdown': cur['admin']='up'\n        elif cur and l.startswith('description '): cur['desc']=l[len('description '):].strip()\n    if cur: interfaces.append(cur)\n    interfaces\n\nparse_config(cfg_text)`; },200);
+});
+
+$('clear-local').addEventListener('click', ()=>{ if(!confirm('مسح التخزين المحلي؟')) return; localStorage.clear(); alert('تم المسح'); });
+
+assignSectionHighlight('dash');
+console.log('NetMaster (fixed) loaded');
+</script>
+
+</body>
+</html>
